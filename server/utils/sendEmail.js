@@ -17,7 +17,6 @@ const sendEmail = async (email, subject, textData, htmlTemplate = null) => {
     const templatePath = path.join(__dirname, "../emails", htmlTemplate);
     html = fs.readFileSync(templatePath, "utf-8");
 
-    // Replace placeholders in the template like {{username}}, {{password}}, etc.
     Object.keys(textData).forEach((key) => {
       html = html.replace(new RegExp(`{{${key}}}`, "g"), textData[key]);
     });

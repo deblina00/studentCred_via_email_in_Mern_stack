@@ -1,9 +1,10 @@
+const StatusCode = require("../helper/httpStatusCode");
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 class AuthController {
-  // Register for only Admin
+  // Register only for Admin
   async registerAdmin(req, res) {
     const { username, email, password } = req.body;
 
@@ -13,7 +14,9 @@ class AuthController {
       });
 
       if (existing) {
-        return res.status(400).json({ message: "Admin already exists" });
+        return res
+          .status(StatusCode.BadRequest)
+          .json({ message: "Admin already exists" });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -26,10 +29,10 @@ class AuthController {
       });
 
       res
-        .status(201)
+        .status(StatusCode.Created)
         .json({ message: "Admin registered successfully", admin: newAdmin });
     } catch (err) {
-      res.status(500).json({ message: err.message });
+      res.status(StatusCode.ServerError).json({ message: err.message });
     }
   }
 
@@ -43,7 +46,9 @@ class AuthController {
       });
 
       if (!user || !(await bcrypt.compare(password, user.password))) {
-        return res.status(401).json({ message: "Invalid credentials" });
+        return res
+          .status(StatusCode.Unauthorized)
+          .json({ message: "Invalid credentials" });
       }
 
       const token = jwt.sign(
@@ -61,11 +66,10 @@ class AuthController {
         },
       });
     } catch (err) {
-      res.status(500).json({ message: "Server error" });
+      res.status(StatusCode.ServerError).json({ message: "Server error" });
     }
   }
 
-  // Reset Password
   async resetPassword(req, res) {
     const { identifier, newPassword } = req.body;
 
@@ -75,17 +79,23 @@ class AuthController {
       });
 
       if (!user) {
-        return res.status(404).json({ message: "User not found" });
+        return res
+          .status(StatusCode.NotFound)
+          .json({ message: "User not found" });
       }
 
       const hashed = await bcrypt.hash(newPassword, 10);
       user.password = hashed;
       await user.save();
 
-      res.status(200).json({ message: "Password reset successful" });
+      res
+        .status(StatusCode.Created)
+        .json({ message: "Password reset successful" });
     } catch (error) {
       console.error("Password reset error:", error);
-      res.status(500).json({ message: "Server error during password reset" });
+      res
+        .status(StatusCode.ServerError)
+        .json({ message: "Server error during password reset" });
     }
   }
 }
