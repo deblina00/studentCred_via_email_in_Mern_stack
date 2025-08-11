@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/authMiddleware");
-const StudentController = require("../controllers/StudentController");
+const StudentController = require("../controllers/studentController");
 
 router.post("/", auth(["admin"]), StudentController.createStudent);
 router.get("/", auth(["admin"]), StudentController.getStudents);
