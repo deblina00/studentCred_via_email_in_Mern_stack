@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "../api/axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function Register() {
   const [form, setForm] = useState({ username: "", email: "", password: "" });
@@ -15,10 +16,10 @@ export default function Register() {
     e.preventDefault();
     try {
       await axios.post("/students", form);
-      alert("Student registered successfully. Email sent.");
+      toast.success("Student registered successfully. Email sent.");
       navigate("/admin");
     } catch (err) {
-      alert("Registration failed. Only admins can register new students.");
+      toast.error("Registration failed. Only admins can register new students.");
     }
   };
 

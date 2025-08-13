@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "../api/axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AdminRegister = () => {
   const navigate = useNavigate();
@@ -11,27 +13,27 @@ const AdminRegister = () => {
     password: "",
   });
 
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
 
     try {
       const res = await axios.post("/auth/register-admin", form);
-      setSuccess("Admin registered successfully!");
+      toast.success("Admin registered successfully!", {
+        position: "top-center",
+        autoClose: 2000,
+      });
       setForm({ username: "", email: "", password: "" });
 
-      // Optional: Redirect to login page after delay
       setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed");
+      toast.error(err.response?.data?.message || "Registration failed", {
+        position: "top-center",
+        autoClose: 3000,
+      });
     }
   };
 
@@ -41,8 +43,6 @@ const AdminRegister = () => {
         <h2 className="text-2xl font-bold mb-6 text-center">
           Admin Registration
         </h2>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
-        {success && <p className="text-green-500 mb-4">{success}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -73,9 +73,11 @@ const AdminRegister = () => {
             <input
               className="p-3 w-full border border-gray-300 rounded pr-12"
               type={showPassword ? "text" : "password"}
+              name="password"
+              value={form.password}
               placeholder="Password"
               required
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              onChange={handleChange}
             />
             <button
               type="button"
@@ -106,3 +108,4 @@ const AdminRegister = () => {
 };
 
 export default AdminRegister;
+

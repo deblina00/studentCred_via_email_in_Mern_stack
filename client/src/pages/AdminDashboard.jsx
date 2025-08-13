@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "../api/axios";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import Sidebar from "../components/Sidebar";
 import StudentFormModal from "../components/StudentFormModal";
 import DeleteConfirmModal from "../components/DeleteConfirmModal";
-//import StudentCard from "../components/StudentCard";
 import { LogOut, Plus, Users, Book, DollarSign } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -15,7 +15,6 @@ export default function AdminDashboard() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
-  //const [viewMode, setViewMode] = useState("table");
 
   const fetchStudents = async () => {
     try {
@@ -23,6 +22,7 @@ export default function AdminDashboard() {
       setStudents(res.data);
     } catch (err) {
       console.error("Failed to fetch students:", err);
+      toast.error("Failed to load students");
     } finally {
       setLoading(false);
     }
@@ -30,8 +30,12 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) navigate("/login");
-    else fetchStudents();
+    if (!token) {
+      toast.warn("Please log in to access the dashboard");
+      navigate("/login");
+    } else {
+      fetchStudents();
+    }
   }, []);
 
   const handleAddClick = () => {
@@ -59,16 +63,16 @@ export default function AdminDashboard() {
         });
         toast.success("Student updated successfully!");
       } else {
-        await axios.post("/students", form);
-        toast.success(
-          "Student added successfully! Credentials have been sent to the student's email."
-        );
+        const res = await axios.post("/students", form);
+        toast.success("Student added successfully! Credentials sent to email.");
+        // Optimistically update state instead of waiting for fetchStudents
+        setStudents((prev) => [...prev, res.data]);
       }
-      fetchStudents();
       setFormModalOpen(false);
+      fetchStudents();
     } catch (err) {
       console.error("Form submit error:", err);
-      toast.error("Failed to submit form.");
+      toast.error(err.response?.data?.message || "Failed to submit form");
     }
   };
 
@@ -79,7 +83,7 @@ export default function AdminDashboard() {
       fetchStudents();
     } catch (err) {
       console.error("Delete error:", err);
-      toast.error("Failed to delete student.");
+      toast.error("Failed to delete student");
     } finally {
       setDeleteModalOpen(false);
     }
@@ -87,117 +91,14 @@ export default function AdminDashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    toast.info("You have been logged out");
     navigate("/login");
   };
 
   return (
-    // <div className="p-8 min-h-screen bg-gradient-to-br from-blue-100 to-purple-200">
-    //   {/* Top bar */}
-    //   <div className="flex justify-between items-center mb-6">
-    //     <h2 className="text-2xl font-bold">Admin Dashboard</h2>
-    //     <div className="flex gap-2">
-    //       <button
-    //         onClick={() => setViewMode(viewMode === "table" ? "card" : "table")}
-    //         className="bg-purple-500 text-white px-4 py-2 rounded"
-    //       >
-    //         {viewMode === "table" ? "Card View" : "Table View"}
-    //       </button>
-    //       <button
-    //         onClick={handleAddClick}
-    //         className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
-    //       >
-    //         Add Student
-    //       </button>
-    //       <button
-    //         onClick={handleLogout}
-    //         className="bg-red-500 text-white px-4 py-2 rounded"
-    //       >
-    //         Logout
-    //       </button>
-    //     </div>
-    //   </div>
-
-    //   {/* Content */}
-    //   {loading ? (
-    //     <p>Loading students...</p>
-    //   ) : viewMode === "table" ? (
-    //     <table className="w-full border bg-">
-    //       <thead>
-    //         <tr>
-    //           <th className="border p-2">Username</th>
-    //           <th className="border p-2">Email</th>
-    //           <th className="border p-2">Actions</th>
-    //         </tr>
-    //       </thead>
-    //       <tbody>
-    //         {students.map((student) => (
-    //           <tr key={student._id}>
-    //             <td className="border p-2">{student.username}</td>
-    //             <td className="border p-2">{student.email}</td>
-    //             <td className="border p-2 flex gap-2">
-    //               <button
-    //                 onClick={() => handleEdit(student)}
-    //                 className="bg-indigo-500 hover:bg-indigo-600 text-white px-2 py-1 rounded"
-    //               >
-    //                 Edit
-    //               </button>
-    //               <button
-    //                 onClick={() => handleDeleteClick(student._id)}
-    //                 className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded"
-    //               >
-    //                 Delete
-    //               </button>
-    //             </td>
-    //           </tr>
-    //         ))}
-    //       </tbody>
-    //     </table>
-    //   ) : (
-    //     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-    //       {students.map((student) => (
-    //         <StudentCard
-    //           key={student._id}
-    //           student={student}
-    //           onEdit={handleEdit}
-    //           onDelete={handleDeleteClick}
-    //         />
-    //       ))}
-    //     </div>
-    //   )}
-
-    //   {/* Modals */}
-    //   <StudentFormModal
-    //     isOpen={formModalOpen}
-    //     onClose={() => setFormModalOpen(false)}
-    //     onSubmit={handleFormSubmit}
-    //     initialData={selectedStudent}
-    //   />
-    //   <DeleteConfirmModal
-    //     isOpen={deleteModalOpen}
-    //     onCancel={() => setDeleteModalOpen(false)}
-    //     onConfirm={handleDeleteConfirm}
-    //   />
-    // </div>
-
     <div className="min-h-screen flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-[#1a2b4c] text-white p-6 flex flex-col">
-        <h2 className="text-2xl font-bold mb-8">School Admin</h2>
-        <nav className="space-y-4">
-          <a href="#" className="block hover:text-[#4c8bf5]">
-            Dashboard
-          </a>
-          <a href="#" className="block hover:text-[#4c8bf5]">
-            Students
-          </a>
-          <a href="#" className="block hover:text-[#4c8bf5]">
-            Teachers
-          </a>
-          <a href="#" className="block hover:text-[#4c8bf5]">
-            Reports
-          </a>
-        </nav>
-      </aside>
+      <Sidebar onLogout={handleLogout} />
 
       {/* Main Content */}
       <div className="flex-1 p-8 bg-gradient-to-br from-blue-100 to-purple-200">
@@ -210,12 +111,6 @@ export default function AdminDashboard() {
             >
               <Plus size={18} /> Add Student
             </button>
-            <button
-              onClick={handleLogout}
-              className="bg-[#f54c61] hover:bg-[#d63d50] text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-md"
-            >
-              <LogOut size={18} /> Logout
-            </button>
           </div>
         </div>
 
@@ -226,7 +121,7 @@ export default function AdminDashboard() {
             </div>
             <div>
               <h3 className="text-lg font-semibold">Students</h3>
-              <p className="text-gray-500">1,245</p>
+              <p className="text-gray-500">{students.length}</p>
             </div>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-md flex items-center gap-4">
@@ -257,6 +152,7 @@ export default function AdminDashboard() {
             </div>
           </div>
         </div>
+
         <div className="bg-white rounded-xl shadow-md p-6">
           {loading ? (
             <p>Loading students...</p>
@@ -281,13 +177,13 @@ export default function AdminDashboard() {
                     <td className="border p-2 flex gap-2">
                       <button
                         onClick={() => handleEdit(student)}
-                        className="bg-[#234b9b] hover:bg-[#1a2b4c] text-white px-2 py-1 rounded"
+                        className="text-[#234b9b] hover:text-[#1a2b4c] px-2 py-1 rounded"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => handleDeleteClick(student._id)}
-                        className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded"
+                        className="text-red-600 hover:text-red-700 px-2 py-1 rounded"
                       >
                         Delete
                       </button>

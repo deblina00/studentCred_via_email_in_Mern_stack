@@ -17,15 +17,18 @@ class StudentController {
         role: "student",
       });
 
-      // send added students their email with credentials
-      await sendEmail(
+      // Respond immediately
+      res.status(StatusCode.Created).json(student);
+
+      // Send email in the background (no await)
+      sendEmail(
         email,
         "Welcome to School Portal",
         { username, password },
         "student-credential.html"
-      );
-
-      res.status(StatusCode.Created).json(student);
+      ).catch((err) => {
+        console.error("Failed to send student email:", err);
+      });
     } catch (err) {
       res.status(StatusCode.BadRequest).json({ message: err.message });
     }

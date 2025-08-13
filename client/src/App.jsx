@@ -8,6 +8,7 @@ import StudentDashboard from "./pages/StudentDashboard";
 import AdminRegister from "./pages/AdminRegister";
 import ResetPassword from "./pages/ResetPassword";
 import Home from "./pages/Home";
+import StudentsPage from "./pages/StudentsPage";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/students" element={<StudentsPage />} />
         <Route path="/student/:id" element={<StudentDashboard />} />
       </Routes>
     </BrowserRouter>

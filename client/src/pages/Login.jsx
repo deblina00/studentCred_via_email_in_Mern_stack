@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "../api/axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function Login() {
   const [identifier, setIdentifier] = useState("");
@@ -15,11 +16,12 @@ export default function Login() {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", res.data.role);
       localStorage.setItem("studentId", res.data.studentId);
+      toast.success("Login successfully!");
 
       const { role, id } = res.data.user;
       role === "admin" ? navigate("/admin") : navigate(`/student/${id}`);
     } catch (err) {
-      alert("Login failed");
+      toast.error(err.response?.data?.message || "Login failed");
     }
   };
 

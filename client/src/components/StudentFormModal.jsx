@@ -1,95 +1,3 @@
-// import { useState, useEffect } from "react";
-
-// export default function StudentFormModal({
-//   isOpen,
-//   onClose,
-//   onSubmit,
-//   initialData,
-// }) {
-//   const [form, setForm] = useState({ username: "", email: "", password: "" });
-//   const [showPassword, setShowPassword] = useState(false);
-
-//   useEffect(() => {
-//     if (initialData) {
-//       setForm({ ...initialData, password: "" });
-//     } else {
-//       setForm({ username: "", email: "", password: "" });
-//     }
-//   }, [initialData]);
-
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     onSubmit(form);
-//   };
-
-//   if (!isOpen) return null;
-
-//   return (
-//     <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center">
-//       <div className="bg-white p-6 rounded shadow-md w-full max-w-md">
-//         <h3 className="text-lg font-semibold mb-4">
-//           {initialData ? "Update Student" : "Add Student"}
-//         </h3>
-//         <form onSubmit={handleSubmit} className="space-y-4">
-//           <input
-//             type="text"
-//             placeholder="Username"
-//             value={form.username}
-//             onChange={(e) => setForm({ ...form, username: e.target.value })}
-//             required
-//             className="w-full border p-2 rounded"
-//           />
-//           <input
-//             type="email"
-//             placeholder="Email"
-//             value={form.email}
-//             onChange={(e) => setForm({ ...form, email: e.target.value })}
-//             required
-//             className="w-full border p-2 rounded"
-//           />
-//           <div className="relative">
-//             <input
-//               type={showPassword ? "text" : "password"}
-//               placeholder={initialData ? "New Password (optional)" : "Password"}
-//               value={form.password}
-//               onChange={(e) => setForm({ ...form, password: e.target.value })}
-//               className="w-full border p-2 rounded pr-16"
-//               required={!initialData}
-//             />
-//             <button
-//               type="button"
-//               onClick={() => setShowPassword(!showPassword)}
-//               className="absolute right-2 top-2 text-sm text-blue-500"
-//             >
-//               {showPassword ? "Hide" : "Show"}
-//             </button>
-//           </div>
-//           <div className="flex justify-end gap-2">
-//             <button
-//               type="button"
-//               onClick={onClose}
-//               className="bg-gray-500 text-white px-4 py-2 rounded"
-//             >
-//               Cancel
-//             </button>
-//             <button
-//               type="submit"
-//               className={`${
-//                 initialData
-//                   ? "bg-indigo-500 hover:bg-indigo-600"
-//                   : "bg-green-500 hover:bg-green-600"
-//               } text-white px-4 py-2 rounded`}
-//             >
-//               {initialData ? "Update" : "Add"}
-//             </button>
-//           </div>
-//         </form>
-//       </div>
-//     </div>
-//   );
-// }
-
-
 import { useState, useEffect } from "react";
 
 export default function StudentFormModal({
@@ -107,7 +15,7 @@ export default function StudentFormModal({
     } else {
       setForm({ username: "", email: "", password: "" });
     }
-  }, [initialData]);
+  }, [initialData, isOpen]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
